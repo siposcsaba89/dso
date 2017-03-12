@@ -39,7 +39,7 @@ namespace dso
 {
 struct CalibHessian;
 struct FrameHessian;
-struct PointFrameResidual;
+class PointFrameResidual;
 
 class CoarseTracker {
 public:

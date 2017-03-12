@@ -29,17 +29,17 @@
 
 #include <sstream>
 #include <fstream>
-#include <dirent.h>
+//#include <dirent.h>
 #include <algorithm>
 
 #include "util/Undistort.h"
 #include "IOWrapper/ImageRW.h"
-
+#include <Windows.h>
 #if HAS_ZIPLIB
 	#include "zip.h"
 #endif
 
-#include <boost/thread.hpp>
+//#include <boost/thread.hpp>
 
 using namespace dso;
 
@@ -47,6 +47,7 @@ using namespace dso;
 
 inline int getdir (std::string dir, std::vector<std::string> &files)
 {
+#if !defined(_WIN32)
     DIR *dp;
     struct dirent *dirp;
     if((dp  = opendir(dir.c_str())) == NULL)
@@ -73,6 +74,19 @@ inline int getdir (std::string dir, std::vector<std::string> &files)
 	}
 
     return files.size();
+
+#else
+    HANDLE hFind;
+    WIN32_FIND_DATA FindFileData;
+    if ((hFind = FindFirstFile((dir + "/*").c_str(), &FindFileData)) != INVALID_HANDLE_VALUE) {
+        do {
+            printf("%s\n", FindFileData.cFileName);
+            files.push_back(FindFileData.cFileName);
+        } while (FindNextFile(hFind, &FindFileData));
+        FindClose(hFind);
+    }
+    return files.size();
+#endif
 }
 
 
@@ -122,7 +136,7 @@ public:
 		{
 #if HAS_ZIPLIB
 			int ziperror=0;
-			ziparchive = zip_open(path.c_str(),  ZIP_RDONLY, &ziperror);
+			ziparchive = zip_open(path.c_str(), 0, &ziperror);
 			if(ziperror!=0)
 			{
 				printf("ERROR %d reading archive %s!\n", ziperror, path.c_str());
@@ -253,7 +267,7 @@ private:
 		{
 #if HAS_ZIPLIB
 			if(databuffer==0) databuffer = new char[widthOrg*heightOrg*6+10000];
-			zip_file_t* fle = zip_fopen(ziparchive, files[id].c_str(), 0);
+			zip_file* fle = zip_fopen(ziparchive, files[id].c_str(), 0);
 			long readbytes = zip_fread(fle, databuffer, (long)widthOrg*heightOrg*6+10000);
 
 			if(readbytes > (long)widthOrg*heightOrg*6)
@@ -372,7 +386,7 @@ private:
 	bool isZipped;
 
 #if HAS_ZIPLIB
-	zip_t* ziparchive;
+	zip* ziparchive;
 	char* databuffer;
 #endif
 };

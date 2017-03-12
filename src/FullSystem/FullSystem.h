@@ -38,9 +38,10 @@
 #include "util/IndexThreadReduce.h"
 #include "OptimizationBackend/EnergyFunctional.h"
 #include "FullSystem/PixelSelector2.h"
-
+#include <mutex>
+#include <condition_variable>
 #include <math.h>
-
+#include <deque>
 namespace dso
 {
 namespace IOWrap
@@ -251,14 +252,14 @@ private:
 
 
 	// =================== changed by tracker-thread. protected by trackMutex ============
-	boost::mutex trackMutex;
+	std::mutex trackMutex;
 	std::vector<FrameShell*> allFrameHistory;
 	CoarseInitializer* coarseInitializer;
 	Vec5 lastCoarseRMSE;
 
 
 	// ================== changed by mapper-thread. protected by mapMutex ===============
-	boost::mutex mapMutex;
+	std::mutex mapMutex;
 	std::vector<FrameShell*> allKeyFramesHistory;
 
 	EnergyFunctional* ef;
@@ -278,7 +279,7 @@ private:
 
 
 	// mutex etc. for tracker exchange.
-	boost::mutex coarseTrackerSwapMutex;			// if tracker sees that there is a new reference, tracker locks [coarseTrackerSwapMutex] and swaps the two.
+	std::mutex coarseTrackerSwapMutex;			// if tracker sees that there is a new reference, tracker locks [coarseTrackerSwapMutex] and swaps the two.
 	CoarseTracker* coarseTracker_forNewKF;			// set as as reference. protected by [coarseTrackerSwapMutex].
 	CoarseTracker* coarseTracker;					// always used to track new frames. protected by [trackMutex].
 	float minIdJetVisTracker, maxIdJetVisTracker;
@@ -289,7 +290,7 @@ private:
 
 
 	// mutex for camToWorl's in shells (these are always in a good configuration).
-	boost::mutex shellPoseMutex;
+	std::mutex shellPoseMutex;
 
 
 
@@ -304,12 +305,12 @@ private:
 	void mappingLoop();
 
 	// tracking / mapping synchronization. All protected by [trackMapSyncMutex].
-	boost::mutex trackMapSyncMutex;
-	boost::condition_variable trackedFrameSignal;
-	boost::condition_variable mappedFrameSignal;
+	std::mutex trackMapSyncMutex;
+	std::condition_variable trackedFrameSignal;
+	std::condition_variable mappedFrameSignal;
 	std::deque<FrameHessian*> unmappedTrackedFrames;
 	int needNewKFAfter;	// Otherwise, a new KF is *needed that has ID bigger than [needNewKFAfter]*.
-	boost::thread mappingThread;
+	std::thread mappingThread;
 	bool runMapping;
 	bool needToKetchupMapping;
 

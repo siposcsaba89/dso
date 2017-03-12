@@ -28,13 +28,12 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <unistd.h>
+//#include <unistd.h>
 
 #include "IOWrapper/Output3DWrapper.h"
 #include "IOWrapper/ImageDisplay.h"
 
 
-#include <boost/thread.hpp>
 #include "util/settings.h"
 #include "util/globalFuncs.h"
 #include "util/DatasetReader.h"
@@ -81,14 +80,14 @@ void my_exit_handler(int s)
 
 void exitThread()
 {
-	struct sigaction sigIntHandler;
-	sigIntHandler.sa_handler = my_exit_handler;
-	sigemptyset(&sigIntHandler.sa_mask);
-	sigIntHandler.sa_flags = 0;
-	sigaction(SIGINT, &sigIntHandler, NULL);
-
-	firstRosSpin=true;
-	while(true) pause();
+	//struct sigaction sigIntHandler;
+	//sigIntHandler.sa_handler = my_exit_handler;
+	//sigemptyset(&sigIntHandler.sa_mask);
+	//sigIntHandler.sa_flags = 0;
+	//sigaction(SIGINT, &sigIntHandler, NULL);
+    //
+	//firstRosSpin=true;
+	//while(true) pause();
 }
 
 
@@ -359,7 +358,7 @@ int main( int argc, char** argv )
 		parseArgument(argv[i]);
 
 	// hook crtl+C.
-	boost::thread exThread = boost::thread(exitThread);
+	std::thread exThread = std::thread(exitThread);
 
 
 	ImageFolderReader* reader = new ImageFolderReader(source,calib, gammaCalib, vignette);
@@ -447,8 +446,8 @@ int main( int argc, char** argv )
             }
         }
 
-        struct timeval tv_start;
-        gettimeofday(&tv_start, NULL);
+        std::chrono::time_point<std::chrono::steady_clock> tv_start;
+        tv_start = std::chrono::high_resolution_clock::now();
         clock_t started = clock();
         double sInitializerOffset=0;
 
@@ -457,7 +456,7 @@ int main( int argc, char** argv )
         {
             if(!fullSystem->initialized)	// if not initialized: reset start time.
             {
-                gettimeofday(&tv_start, NULL);
+                tv_start = std::chrono::high_resolution_clock::now();
                 started = clock();
                 sInitializerOffset = timesToPlayAt[ii];
             }
@@ -476,11 +475,13 @@ int main( int argc, char** argv )
             bool skipFrame=false;
             if(playbackSpeed!=0)
             {
-                struct timeval tv_now; gettimeofday(&tv_now, NULL);
-                double sSinceStart = sInitializerOffset + ((tv_now.tv_sec-tv_start.tv_sec) + (tv_now.tv_usec-tv_start.tv_usec)/(1000.0f*1000.0f));
+                auto tv_now = std::chrono::high_resolution_clock::now();
+                double sSinceStart = sInitializerOffset + std::chrono::duration_cast<std::chrono::milliseconds>(tv_now - tv_start).count() / 1000.0;
 
-                if(sSinceStart < timesToPlayAt[ii])
-                    usleep((int)((timesToPlayAt[ii]-sSinceStart)*1000*1000));
+                if (sSinceStart < timesToPlayAt[ii])
+                {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(int((timesToPlayAt[ii] - sSinceStart) * 1000)));
+                }
                 else if(sSinceStart > timesToPlayAt[ii]+0.5+0.1*(ii%2))
                 {
                     printf("SKIPFRAME %d (play at %f, now it is %f)!\n", ii, timesToPlayAt[ii], sSinceStart);
@@ -528,9 +529,8 @@ int main( int argc, char** argv )
         }
         fullSystem->blockUntilMappingIsFinished();
         clock_t ended = clock();
-        struct timeval tv_end;
-        gettimeofday(&tv_end, NULL);
-
+        auto tv_end = std::chrono::high_resolution_clock::now();
+        
 
         fullSystem->printResult("result.txt");
 
@@ -538,7 +538,7 @@ int main( int argc, char** argv )
         int numFramesProcessed = abs(idsToPlay[0]-idsToPlay.back());
         double numSecondsProcessed = fabs(reader->getTimestamp(idsToPlay[0])-reader->getTimestamp(idsToPlay.back()));
         double MilliSecondsTakenSingle = 1000.0f*(ended-started)/(float)(CLOCKS_PER_SEC);
-        double MilliSecondsTakenMT = sInitializerOffset + ((tv_end.tv_sec-tv_start.tv_sec)*1000.0f + (tv_end.tv_usec-tv_start.tv_usec)/1000.0f);
+        double MilliSecondsTakenMT = sInitializerOffset + std::chrono::duration_cast<std::chrono::milliseconds>((tv_end-tv_start)).count();
         printf("\n======================"
                 "\n%d Frames (%.1f fps)"
                 "\n%.2fms per frame (single core); "
@@ -557,7 +557,7 @@ int main( int argc, char** argv )
             std::ofstream tmlog;
             tmlog.open("logs/time.txt", std::ios::trunc | std::ios::out);
             tmlog << 1000.0f*(ended-started)/(float)(CLOCKS_PER_SEC*reader->getNumImages()) << " "
-                  << ((tv_end.tv_sec-tv_start.tv_sec)*1000.0f + (tv_end.tv_usec-tv_start.tv_usec)/1000.0f) / (float)reader->getNumImages() << "\n";
+                  <<  (float)reader->getNumImages() << "\n";
             tmlog.flush();
             tmlog.close();
         }

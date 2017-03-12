@@ -36,14 +36,17 @@
 
 namespace dso
 {
-class PointHessian;
-class FrameHessian;
-class CalibHessian;
+struct PointHessian;
+struct FrameHessian;
+struct CalibHessian;
 
 class EFResidual;
 
 
 enum ResLocation {ACTIVE=0, LINEARIZED, MARGINALIZED, NONE};
+#if defined(IN)
+#undef IN
+#endif
 enum ResState {IN=0, OOB, OUTLIER};
 
 struct FullJacRowT
@@ -92,9 +95,9 @@ public:
 	void resetOOB()
 	{
 		state_NewEnergy = state_energy = 0;
-		state_NewState = ResState::OUTLIER;
+		state_NewState = OUTLIER;
 
-		setState(ResState::IN);
+		setState(IN);
 	};
 	void applyRes( bool copyJacobians);
 

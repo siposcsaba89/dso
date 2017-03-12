@@ -29,7 +29,6 @@
 //#include <GL/glx.h>
 //#include <GL/gl.h>
 //#include <GL/glu.h>
-
 #include <pangolin/pangolin.h>
 #include "KeyFrameDisplay.h"
 #include "FullSystem/HessianBlocks.h"

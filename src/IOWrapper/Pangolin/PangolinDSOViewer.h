@@ -23,19 +23,24 @@
 
 
 #pragma once
+#if defined(min)
+#undef min
+#undef max
+#endif
 #include <pangolin/pangolin.h>
-#include "boost/thread.hpp"
+//#include "boost/thread.hpp"
 #include "util/MinimalImage.h"
 #include "IOWrapper/Output3DWrapper.h"
 #include <map>
 #include <deque>
-
+#include <chrono>
+#include <mutex>
 
 namespace dso
 {
 
-class FrameHessian;
-class CalibHessian;
+struct FrameHessian;
+struct CalibHessian;
 class FrameShell;
 
 
@@ -85,14 +90,14 @@ private:
 	void reset_internal();
 	void drawConstraints();
 
-	boost::thread runThread;
+	std::thread runThread;
 	bool running;
 	int w,h;
 
 
 
 	// images rendering
-	boost::mutex openImagesMutex;
+	std::mutex openImagesMutex;
 	MinimalImageB3* internalVideoImg;
 	MinimalImageB3* internalKFImg;
 	MinimalImageB3* internalResImg;
@@ -101,7 +106,7 @@ private:
 
 
 	// 3D model rendering
-	boost::mutex model3DMutex;
+	std::mutex model3DMutex;
 	KeyFrameDisplay* currentCam;
 	std::vector<KeyFrameDisplay*> keyframes;
 	std::vector<Vec3f,Eigen::aligned_allocator<Vec3f>> allFramePoses;
@@ -126,8 +131,8 @@ private:
 
 
 	// timings
-	struct timeval last_track;
-	struct timeval last_map;
+	std::chrono::time_point<std::chrono::steady_clock> last_track;
+    std::chrono::time_point<std::chrono::steady_clock> last_map;
 
 
 	std::deque<float> lastNTrackingMs;

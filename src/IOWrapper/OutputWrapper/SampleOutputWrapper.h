@@ -23,7 +23,7 @@
 
 
 #pragma once
-#include "boost/thread.hpp"
+//#include "boost/thread.hpp"
 #include "util/MinimalImage.h"
 #include "IOWrapper/Output3DWrapper.h"
 
