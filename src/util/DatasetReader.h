@@ -43,7 +43,7 @@
 
 using namespace dso;
 
-
+//gamma=f:\tmp\sequence_47\sequence_47\pcalib.txt vignette=f:\tmp\sequence_47\sequence_47\vignette.png
 
 inline int getdir (std::string dir, std::vector<std::string> &files)
 {
@@ -63,30 +63,31 @@ inline int getdir (std::string dir, std::vector<std::string> &files)
     }
     closedir(dp);
 
-
-    std::sort(files.begin(), files.end());
-
-    if(dir.at( dir.length() - 1 ) != '/') dir = dir+"/";
-	for(unsigned int i=0;i<files.size();i++)
-	{
-		if(files[i].at(0) != '/')
-			files[i] = dir + files[i];
-	}
-
-    return files.size();
-
 #else
     HANDLE hFind;
     WIN32_FIND_DATA FindFileData;
     if ((hFind = FindFirstFile((dir + "/*").c_str(), &FindFileData)) != INVALID_HANDLE_VALUE) {
         do {
-            printf("%s\n", FindFileData.cFileName);
-            files.push_back(FindFileData.cFileName);
+            std::string name = FindFileData.cFileName;
+            if (name != "." && name != "..")
+                files.push_back(name);
         } while (FindNextFile(hFind, &FindFileData));
         FindClose(hFind);
     }
-    return files.size();
 #endif
+
+    std::sort(files.begin(), files.end());
+
+    if (dir.at(dir.length() - 1) != '/') dir = dir + "/";
+    for (unsigned int i = 0; i<files.size(); i++)
+    {
+        if (files[i].at(0) != '/')
+            files[i] = dir + files[i];
+    }
+
+    return files.size();
+
+
 }
 
 

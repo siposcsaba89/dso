@@ -84,9 +84,7 @@ target_include_directories(dso PUBLIC
 if (LIBZIP_LIBRARY)
 	message("--- found ziplib (${LIBZIP_VERSION}), compiling with zip capability.")
 	target_compile_definitions(dso PUBLIC -DHAS_ZIPLIB=1)
-	target_include_directories(dso PUBLIC 
-        $<BUILD_INTERFACE:${LIBZIP_INCLUDE_DIR_ZIP}>
-        $<BUILD_INTERFACE:${LIBZIP_INCLUDE_DIR_ZIPCONF}> ) 
+	target_include_directories(dso PUBLIC ${LIBZIP_INCLUDE_DIR_ZIP} ${LIBZIP_INCLUDE_DIR_ZIPCONF}) 
 else()
 	message("--- not found ziplib (${LIBZIP_LIBRARY}), compiling without zip capability.")
 	set(LIBZIP_LIBRARY "")
@@ -94,9 +92,8 @@ endif()
 
 # decide if we have openCV
 if (OpenCV_FOUND)
-	message("--- found OpenCV, compiling dso_opencv library.")
-    target_include_directories(dso PUBLIC 
-        $<BUILD_INTERFACE:${OpenCV_INCLUDE_DIRS}>) 
+	message("--- found OpenCV, compiling dso_opencv library. ${OpenCV_INCLUDE_DIRS}")
+    target_include_directories(dso PUBLIC ${OpenCV_INCLUDE_DIRS}) 
 	target_sources(dso PRIVATE
 	  ${PROJECT_SOURCE_DIR}/src/IOWrapper/OpenCV/ImageDisplay_OpenCV.cpp
 	  ${PROJECT_SOURCE_DIR}/src/IOWrapper/OpenCV/ImageRW_OpenCV.cpp)
