@@ -22,7 +22,6 @@ find_package(Pangolin REQUIRED CONFIG)
 find_package(OpenCV REQUIRED)
 
 
-
 # Sources files
 set(dso_SOURCE_FILES
   ${PROJECT_SOURCE_DIR}/src/FullSystem/FullSystem.cpp
@@ -105,6 +104,7 @@ target_link_libraries(dso PUBLIC ::Eigen3)
 target_include_directories(dso PUBLIC 
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/thirdparty/Sophus>
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/thirdparty/sse2neon>
 )
 
 

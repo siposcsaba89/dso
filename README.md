@@ -61,6 +61,9 @@ to unzip the dataset image archives before loading them).
 	sudo make install
 	sudo cp lib/zipconf.h /usr/local/include/zipconf.h   # (no idea why that is needed).
 
+##### sse2neon (required for ARM builds).
+After cloning, just run `git submodule update --init` to include this.  It translates Intel-native SSE functions to ARM-native NEON functions during the compilation process.
+
 #### 2.3 Build
 
 		cd dso
@@ -137,7 +140,7 @@ However, it should be easy to adapt it to your needs, if required. The binary is
 
 ###### Calibration File for Equidistant camera model
 
-    Equidistant fx fy cx cy k1 k2 r1 r2
+    EquiDistant fx fy cx cy k1 k2 r1 r2
     in_width in_height
     "crop" / "full" / "fx fy cx cy 0"
     out_width out_height

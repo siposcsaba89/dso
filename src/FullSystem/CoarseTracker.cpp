@@ -37,6 +37,10 @@
 #include "IOWrapper/ImageRW.h"
 #include <algorithm>
 
+#if !defined(__SSE3__) && !defined(__SSE2__) && !defined(__SSE1__)
+//#include "SSE2NEON.h"
+#endif
+
 namespace dso
 {
 
@@ -289,7 +293,7 @@ void CoarseTracker::makeCoarseDepthL0(std::vector<FrameHessian*> frameHessians)
 
 
 
-void CoarseTracker::calcGSSSE(int lvl, Mat88 &H_out, Vec8 &b_out, SE3 refToNew, AffLight aff_g2l)
+void CoarseTracker::calcGSSSE(int lvl, Mat88 &H_out, Vec8 &b_out, const SE3 &refToNew, AffLight aff_g2l)
 {
 	acc.initialize();
 
@@ -351,7 +355,7 @@ void CoarseTracker::calcGSSSE(int lvl, Mat88 &H_out, Vec8 &b_out, SE3 refToNew, 
 
 
 
-Vec6 CoarseTracker::calcRes(int lvl, SE3 refToNew, AffLight aff_g2l, float cutoffTH)
+Vec6 CoarseTracker::calcRes(int lvl, const SE3 &refToNew, AffLight aff_g2l, float cutoffTH)
 {
 	float E = 0;
 	int numTermsInE = 0;
