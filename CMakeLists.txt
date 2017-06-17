@@ -26,23 +26,49 @@ find_package(OpenCV REQUIRED)
 # Sources files
 set(dso_SOURCE_FILES
   ${PROJECT_SOURCE_DIR}/src/FullSystem/FullSystem.cpp
+  ${PROJECT_SOURCE_DIR}/src/FullSystem/FullSystem.h
   ${PROJECT_SOURCE_DIR}/src/FullSystem/FullSystemOptimize.cpp
   ${PROJECT_SOURCE_DIR}/src/FullSystem/FullSystemOptPoint.cpp
   ${PROJECT_SOURCE_DIR}/src/FullSystem/FullSystemDebugStuff.cpp
   ${PROJECT_SOURCE_DIR}/src/FullSystem/FullSystemMarginalize.cpp
   ${PROJECT_SOURCE_DIR}/src/FullSystem/Residuals.cpp
+  ${PROJECT_SOURCE_DIR}/src/FullSystem/Residuals.h
   ${PROJECT_SOURCE_DIR}/src/FullSystem/CoarseTracker.cpp
+  ${PROJECT_SOURCE_DIR}/src/FullSystem/CoarseTracker.h
   ${PROJECT_SOURCE_DIR}/src/FullSystem/CoarseInitializer.cpp
+  ${PROJECT_SOURCE_DIR}/src/FullSystem/CoarseInitializer.h
   ${PROJECT_SOURCE_DIR}/src/FullSystem/ImmaturePoint.cpp
+  ${PROJECT_SOURCE_DIR}/src/FullSystem/ImmaturePoint.h
   ${PROJECT_SOURCE_DIR}/src/FullSystem/HessianBlocks.cpp
+  ${PROJECT_SOURCE_DIR}/src/FullSystem/HessianBlocks.h
   ${PROJECT_SOURCE_DIR}/src/FullSystem/PixelSelector2.cpp
+  ${PROJECT_SOURCE_DIR}/src/FullSystem/PixelSelector.h
+  ${PROJECT_SOURCE_DIR}/src/FullSystem/PixelSelector2.h
+  ${PROJECT_SOURCE_DIR}/src/FullSystem/ResidualProjections.h
   ${PROJECT_SOURCE_DIR}/src/OptimizationBackend/EnergyFunctional.cpp
+  ${PROJECT_SOURCE_DIR}/src/OptimizationBackend/EnergyFunctional.h
   ${PROJECT_SOURCE_DIR}/src/OptimizationBackend/AccumulatedTopHessian.cpp
+  ${PROJECT_SOURCE_DIR}/src/OptimizationBackend/AccumulatedTopHessian.h
   ${PROJECT_SOURCE_DIR}/src/OptimizationBackend/AccumulatedSCHessian.cpp
+  ${PROJECT_SOURCE_DIR}/src/OptimizationBackend/AccumulatedSCHessian.h
   ${PROJECT_SOURCE_DIR}/src/OptimizationBackend/EnergyFunctionalStructs.cpp
+  ${PROJECT_SOURCE_DIR}/src/OptimizationBackend/EnergyFunctionalStructs.h
+  ${PROJECT_SOURCE_DIR}/src/OptimizationBackend/MatrixAccumulators.h
+  ${PROJECT_SOURCE_DIR}/src/OptimizationBackend/RawResidualJacobian.h
   ${PROJECT_SOURCE_DIR}/src/util/settings.cpp
+  ${PROJECT_SOURCE_DIR}/src/util/settings.h
+  ${PROJECT_SOURCE_DIR}/src/util/DatasetReader.h
+  ${PROJECT_SOURCE_DIR}/src/util/FrameShell.h
+  ${PROJECT_SOURCE_DIR}/src/util/globalFuncs.h
+  ${PROJECT_SOURCE_DIR}/src/util/ImageAndExposure.h
+  ${PROJECT_SOURCE_DIR}/src/util/IndexThreadReduce.h
+  ${PROJECT_SOURCE_DIR}/src/util/MinimalImage.h
+  ${PROJECT_SOURCE_DIR}/src/util/nanoflann.h
+  ${PROJECT_SOURCE_DIR}/src/util/NumType.h
   ${PROJECT_SOURCE_DIR}/src/util/Undistort.cpp
+  ${PROJECT_SOURCE_DIR}/src/util/Undistort.h
   ${PROJECT_SOURCE_DIR}/src/util/globalCalib.cpp
+  ${PROJECT_SOURCE_DIR}/src/util/globalCalib.h
 )
 
 
@@ -52,7 +78,9 @@ if (Pangolin_FOUND)
 	#include_directories( ${Pangolin_INCLUDE_DIRS} ) 
 	set(dso_pangolin_SOURCE_FILES 
 	  ${PROJECT_SOURCE_DIR}/src/IOWrapper/Pangolin/KeyFrameDisplay.cpp
-	  ${PROJECT_SOURCE_DIR}/src/IOWrapper/Pangolin/PangolinDSOViewer.cpp)
+	  ${PROJECT_SOURCE_DIR}/src/IOWrapper/Pangolin/KeyFrameDisplay.h
+	  ${PROJECT_SOURCE_DIR}/src/IOWrapper/Pangolin/PangolinDSOViewer.cpp
+	  ${PROJECT_SOURCE_DIR}/src/IOWrapper/Pangolin/PangolinDSOViewer.h)
 	set(HAS_PANGOLIN 1)
 else ()
 	message("--- could not find PANGOLIN, not compiling dso_pangolin library.")
@@ -102,14 +130,17 @@ else ()
 	message("    this means there will be no image display, and image read / load functionality.")
 	target_sources(dso 
 	  ${PROJECT_SOURCE_DIR}/src/IOWrapper/ImageDisplay_dummy.cpp
-	  ${PROJECT_SOURCE_DIR}/src/IOWrapper/ImageRW_dummy.cpp)
+	  ${PROJECT_SOURCE_DIR}/src/IOWrapper/ImageRW_dummy.cpp
+	  ${PROJECT_SOURCE_DIR}/src/IOWrapper/ImageRW.h
+	  ${PROJECT_SOURCE_DIR}/src/IOWrapper/Output3DWrapper.h
+	  ${PROJECT_SOURCE_DIR}/src/IOWrapper/ImageDisplay.h)
 endif ()
 
 # build main executable (only if we have both OpenCV and Pangolin)
 if (OpenCV_FOUND AND Pangolin_FOUND)
 	message("--- compiling dso_dataset.")
 	add_executable(dso_dataset ${PROJECT_SOURCE_DIR}/src/main_dso_pangolin.cpp )
-    target_link_libraries(dso_dataset dso ${LIBZIP_LIBRARY}  ${OpenCV_LIBS})
+    target_link_libraries(dso_dataset dso ${LIBZIP_LIBRARY}  ${OpenCV_LIBRARIES})
     target_link_libraries(dso_dataset ::pangolin)
     target_link_libraries(dso PUBLIC ::pangolin)
 else()
