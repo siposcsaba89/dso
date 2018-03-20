@@ -136,6 +136,12 @@ else ()
 	  ${PROJECT_SOURCE_DIR}/src/IOWrapper/ImageDisplay.h)
 endif ()
 
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin") # OSX
+    set(BOOST_THREAD_LIBRARY boost_thread-mt)
+else()
+    set(BOOST_THREAD_LIBRARY boost_thread)
+endif()
+
 # build main executable (only if we have both OpenCV and Pangolin)
 if (OpenCV_FOUND AND Pangolin_FOUND)
 	message("--- compiling dso_dataset.")
