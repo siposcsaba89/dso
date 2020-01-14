@@ -667,7 +667,7 @@ void FullSystem::activatePointsMT()
 		}
 		else if(newpoint == (PointHessian*)((long)(-1)) || ph->lastTraceStatus==IPS_OOB)
 		{
-			delete ph;
+			//delete ph;
 			ph->host->immaturePoints[ph->idxInImmaturePoints]=0;
 		}
 		else

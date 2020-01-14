@@ -23,6 +23,8 @@
 #ifndef SOPHUS_HPP
 #define SOPHUS_HPP
 
+#define _USE_MATH_DEFINES
+
 #include <stdexcept>
 
 // fix log1p not being found on Android in Eigen
@@ -32,7 +34,7 @@ namespace std {
   using ::log1p;
 }
 #endif
-
+#include <math.h>
 #include <Eigen/Eigen>
 #include <Eigen/Geometry>
 
