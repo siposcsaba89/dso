@@ -93,6 +93,8 @@ public:
         return (id < other.id);
     }
 
+	std::vector<Eigen::Vector3f> pcl;
+	std::vector<Eigen::Matrix<unsigned char, 3,1>> pcl_color;
 
 private:
 	float fx,fy,cx,cy;

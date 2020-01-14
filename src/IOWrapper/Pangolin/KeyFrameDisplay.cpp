@@ -242,7 +242,7 @@ bool KeyFrameDisplay::refreshPC(bool canRefresh, float scaledTH, float absTH, in
 			tmpVertexBuffer[vertexBufferNumPoints][1] = ((originalInputSparse[i].v+dy)*fyi + cyi) * depth;
 			tmpVertexBuffer[vertexBufferNumPoints][2] = depth*(1 + 2*fxi * (rand()/(float)RAND_MAX-0.5f));
 
-
+			pcl.push_back(tmpVertexBuffer[vertexBufferNumPoints]);
 
 			if(my_displayMode==0)
 			{
@@ -284,6 +284,7 @@ bool KeyFrameDisplay::refreshPC(bool canRefresh, float scaledTH, float absTH, in
 				tmpColorBuffer[vertexBufferNumPoints][1] = originalInputSparse[i].color[pnt];
 				tmpColorBuffer[vertexBufferNumPoints][2] = originalInputSparse[i].color[pnt];
 			}
+			pcl_color.push_back(tmpColorBuffer[vertexBufferNumPoints]);
 			vertexBufferNumPoints++;
 
 

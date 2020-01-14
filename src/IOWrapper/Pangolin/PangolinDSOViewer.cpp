@@ -291,7 +291,7 @@ void PangolinDSOViewer::run()
 
 	printf("QUIT Pangolin thread!\n");
 	printf("I'll just kill the whole process.\nSo Long, and Thanks for All the Fish!\n");
-
+	reset_internal();
 	exit(1);
 }
 
@@ -304,6 +304,7 @@ void PangolinDSOViewer::close()
 void PangolinDSOViewer::join()
 {
 	runThread.join();
+	reset_internal();
 	printf("JOINED Pangolin thread!\n");
 }
 
@@ -315,6 +316,41 @@ void PangolinDSOViewer::reset()
 void PangolinDSOViewer::reset_internal()
 {
 	model3DMutex.lock();
+	size_t num_pts = 0;
+	for (size_t i = 0; i < keyframes.size(); i++) num_pts+= keyframes[i]->pcl.size();
+	std::ofstream of("pcl.ply");
+	//header
+	of << "ply" << std::endl <<
+		"format ascii 1.0" << std::endl <<
+		"element vertex " << num_pts << std::endl <<
+		"property float x" << std::endl <<
+		"property float y" << std::endl <<
+		"property float z" << std::endl <<
+		"property uchar red" << std::endl <<
+		"property uchar green" << std::endl <<
+		"property uchar blue" << std::endl <<
+		"end_header" << std::endl;
+
+	int r = 255;
+	int g = 255;
+	int b = 255;
+	
+	for (size_t j = 0; j < keyframes.size(); j++)
+	{
+		auto& pc = keyframes[j]->pcl;
+		auto& pc_c = keyframes[j]->pcl_color;
+		auto cam_to_w = keyframes[j]->camToWorld;
+		for (size_t i = 0; i < pc.size(); i++)
+		{
+			Eigen::Vector3f t = (cam_to_w* pc[i].cast<double>()).cast<float>();
+			of << (float)t[0] << " " << t[1] << " " << t[2] << " " << int(pc_c[i][0]) << " " << int(pc_c[i][1]) << " " << int(pc_c[i][2]) << std::endl;
+		}
+	}
+	of.close();
+
+
+
+
 	for(size_t i=0; i<keyframes.size();i++) delete keyframes[i];
 	keyframes.clear();
 	allFramePoses.clear();
