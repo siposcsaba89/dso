@@ -27,6 +27,11 @@
 
 #include <stdexcept>
 
+#ifndef _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
+#include <math.h>
+#endif
+
 // fix log1p not being found on Android in Eigen
 #if defined( ANDROID )
 #include <cmath>

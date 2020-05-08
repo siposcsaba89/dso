@@ -17,9 +17,13 @@ find_path(LIBZIP_INCLUDE_DIR_ZIPCONF
     NAMES zipconf.h
     HINTS ${PC_LIBZIP_INCLUDE_DIRS})
 
-find_library(LIBZIP_LIBRARY
+find_library(LIBZIP_LIBRARY_RELEASE
     NAMES zip)
 
+find_library(LIBZIP_LIBRARY_DEBUG
+    NAMES zipd)
+
+set(LIBZIP_LIBRARY debug ${LIBZIP_LIBRARY_DEBUG} optimized ${LIBZIP_LIBRARY_RELEASE})
 include(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(
     LIBZIP DEFAULT_MSG

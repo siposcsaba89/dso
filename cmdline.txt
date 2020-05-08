@@ -1,0 +1,1 @@
+files=d:\tmp\sequence_11\sequence_11\images.zip calib=d:\tmp\sequence_11\sequence_11\camera.txt gamma=d:\tmp\sequence_11\sequence_11\pcalib.txt vignette=d:\tmp\sequence_11\sequence_11\vignette.png preset=0 mode=0

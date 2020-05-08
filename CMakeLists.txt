@@ -15,9 +15,14 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 # required libraries
 
 # optional libraries
-find_package(LibZip REQUIRED)
-find_package(libjpeg-turbo REQUIRED)
+find_package(LIBZIP REQUIRED)
 find_package(Eigen3 REQUIRED CONFIG)
+find_package(JPEG REQUIRED)
+find_package(TIFF REQUIRED)
+message(STATUS "Jpeg: ${JPEG_LIBRARIES}")
+if (TARGET JPEG::JPEG)
+	message(STATUS "Jpeg target exists")
+endif()
 find_package(Pangolin REQUIRED CONFIG)
 find_package(OpenCV REQUIRED)
 
@@ -100,7 +105,7 @@ elseif(CMAKE_COMPILER_IS_GNUCXX )
     target_compile_options(dso PUBLIC "${SSE_FLAGS} -O3 -g -std=c++0x -march=native")
 endif()
 
-target_link_libraries(dso PUBLIC ::Eigen3)
+target_link_libraries(dso PUBLIC Eigen3::Eigen)
 target_include_directories(dso PUBLIC 
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/thirdparty/Sophus>
@@ -147,8 +152,8 @@ if (OpenCV_FOUND AND Pangolin_FOUND)
 	message("--- compiling dso_dataset.")
 	add_executable(dso_dataset ${PROJECT_SOURCE_DIR}/src/main_dso_pangolin.cpp )
     target_link_libraries(dso_dataset dso ${LIBZIP_LIBRARY}  ${OpenCV_LIBRARIES})
-    target_link_libraries(dso_dataset ::pangolin)
-    target_link_libraries(dso PUBLIC ::pangolin)
+    target_link_libraries(dso_dataset pangolin)
+    target_link_libraries(dso PUBLIC pangolin)
 else()
 	message("--- not building dso_dataset, since either don't have openCV or Pangolin.")
 endif()
