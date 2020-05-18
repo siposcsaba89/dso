@@ -131,7 +131,6 @@ private:
 	Accumulator9 acc9SC;
 
 
-	Vec3f dGrads[PYR_LEVELS];
 
 	float alphaK;
 	float alphaW;
